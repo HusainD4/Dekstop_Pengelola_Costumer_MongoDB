@@ -20,10 +20,17 @@ public class MyAppStorageDashboard extends javax.swing.JFrame {
     /**
      * Creates new form MyAppStorageDashboard
      */
-    public MyAppStorageDashboard() {
-        initComponents();
-        loadDataToTable();
+public MyAppStorageDashboard() {
+    initComponents();
+
+    if (!connection.connect()) {
+        JOptionPane.showMessageDialog(this, "Gagal terhubung ke MongoDB. Aplikasi akan keluar.");
+        System.exit(1);
     }
+
+    loadDataToTable();
+}
+
 
     private void loadDataToTable() {
         MongoDatabase database = connection.getDatabase();
@@ -32,7 +39,7 @@ public class MyAppStorageDashboard extends javax.swing.JFrame {
             return;
         }
 
-        var collection = database.getCollection("Customer");
+        var collection = database.getCollection("Costumers");
         MongoCursor<Document> cursor = collection.find().iterator();
 
         String[] columnNames = {"ID", "Name", "Gender", "Email", "Phone"};
@@ -360,7 +367,7 @@ public class MyAppStorageDashboard extends javax.swing.JFrame {
         }
 
         MongoDatabase database = connection.getDatabase();
-        var collection = database.getCollection("Customer");
+        var collection = database.getCollection("Costumers");
 
         Document newCustomer = new Document("name", name)
                 .append("gender", gender.toLowerCase())
@@ -391,7 +398,7 @@ public class MyAppStorageDashboard extends javax.swing.JFrame {
         String newPhone = JOptionPane.showInputDialog("No HP baru:", currentPhone);
 
         MongoDatabase database = connection.getDatabase();
-        var collection = database.getCollection("Customer");
+        var collection = database.getCollection("Costumers");
 
         Document updatedCustomer = new Document("name", newName)
                 .append("gender", newGender.toLowerCase())
@@ -414,7 +421,7 @@ public class MyAppStorageDashboard extends javax.swing.JFrame {
 
         String idToDelete = (String) TB_Data.getValueAt(selectedRow, 0);
         MongoDatabase database = connection.getDatabase();
-        var collection = database.getCollection("Customer");
+        var collection = database.getCollection("Costumers");
 
         Document query = new Document("_id", new org.bson.types.ObjectId(idToDelete));
         DeleteResult result = collection.deleteOne(query);
